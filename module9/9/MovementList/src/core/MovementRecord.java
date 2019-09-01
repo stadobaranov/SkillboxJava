@@ -1,16 +1,15 @@
-import util.Currency;
-import util.Money;
+package core;
 
-public class MovementListItem {
+public class MovementRecord {
     private final String serviceName;
     private final MovementType type;
-    private final Money money;
+    private final Money sum;
     private final Currency currency;
 
-    public MovementListItem(String serviceName, MovementType type, Money money, Currency currency) {
+    public MovementRecord(String serviceName, MovementType type, Money sum, Currency currency) {
         this.serviceName = serviceName;
         this.type = type;
-        this.money = money;
+        this.sum = sum;
         this.currency = currency;
     }
 
@@ -22,8 +21,8 @@ public class MovementListItem {
         return type;
     }
 
-    public Money getMoney() {
-        return money;
+    public Money getSum() {
+        return sum;
     }
 
     public Currency getCurrency() {

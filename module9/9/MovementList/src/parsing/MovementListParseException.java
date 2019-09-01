@@ -1,3 +1,5 @@
+package parsing;
+
 public class MovementListParseException extends RuntimeException {
     public MovementListParseException(String message) {
         super(message);
