@@ -19,20 +19,19 @@ public class ImageDownloader {
     private final String url;
     private final String folderPath;
     private final Function<String, String> nameGenerator;
-    private final byte buffer[];
 
     public ImageDownloader(String url, String folderPath, Function<String, String> nameGenerator) {
         this.url = url;
         this.folderPath = folderPath;
         this.nameGenerator = nameGenerator;
-        this.buffer = new byte[BUFFER_SIZE];
     }
 
     public void download() throws IOException {
         Document document = Jsoup.connect(url).get();
 
-        for(Element element: document.select("img"))
+        for(Element element: document.select("img")) {
             downloadImage(element);
+        }
     }
 
     private void downloadImage(Element image) throws IOException {
@@ -40,20 +39,9 @@ public class ImageDownloader {
         String dst = folderPath + File.separator + nameGenerator.apply(src);
         URL url = new URL(src);
 
-        try(InputStream is = new BufferedInputStream(url.openStream(), BUFFER_SIZE)) {
-            try(OutputStream os = new BufferedOutputStream(new FileOutputStream(dst), BUFFER_SIZE)) {
-                for(;;) {
-                    int bytes = is.read(buffer);
-
-                    if(bytes < 0) {
-                        break;
-                    }
-
-                    os.write(buffer, 0, bytes);
-                }
-
-                os.flush();
-            }
+        try(InputStream is = new BufferedInputStream(url.openStream(), BUFFER_SIZE);
+                OutputStream os = new BufferedOutputStream(new FileOutputStream(dst), BUFFER_SIZE)) {
+            is.transferTo(os);
         }
     }
 
