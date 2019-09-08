@@ -14,7 +14,7 @@ public class App {
             Statement statement = connection.createStatement();
 
             ResultSet resultSet = statement.executeQuery(
-                "SELECT course_name AS name, COUNT(*) / MONTH(NOW()) as avg_purchase_count FROM PurchaseList GROUP BY name ORDER BY name"
+                "SELECT course_name AS name, COUNT(*) / IF(@p:=TIMESTAMPDIFF(MONTH, '2018-01-01', NOW()) > 12, 12, @p) as avg_purchase_count FROM PurchaseList GROUP BY name ORDER BY name"
             );
 
             while(resultSet.next()) {
