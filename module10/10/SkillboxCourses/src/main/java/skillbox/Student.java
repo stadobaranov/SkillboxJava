@@ -5,12 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "Students")
@@ -27,7 +26,7 @@ public class Student {
     private LocalDateTime registrationDate;
 
     @ManyToMany(mappedBy = "students")
-    private List<Course> courses;
+    private Set<Course> courses;
 
     public int getId() {
         return id;
@@ -61,11 +60,29 @@ public class Student {
         this.registrationDate = registrationDate;
     }
 
-    public List<Course> getCourses() {
+    public Set<Course> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
+    public void setCourses(Set<Course> courses) {
         this.courses = courses;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age, registrationDate);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(other instanceof Student) {
+            Student otherStudent = (Student)other;
+
+            return Objects.equals(name, otherStudent.name) &&
+                   age == otherStudent.age &&
+                   Objects.equals(registrationDate, otherStudent.registrationDate);
+        }
+
+        return false;
     }
 }

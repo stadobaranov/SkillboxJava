@@ -6,7 +6,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "Teachers")
@@ -22,7 +23,7 @@ public class Teacher {
     private int age;
 
     @OneToMany(mappedBy = "teacher")
-    private List<Course> courses;
+    private Set<Course> courses;
 
     public int getId() {
         return id;
@@ -56,11 +57,26 @@ public class Teacher {
         this.age = age;
     }
 
-    public List<Course> getCourses() {
+    public Set<Course> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
+    public void setCourses(Set<Course> courses) {
         this.courses = courses;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(other instanceof Teacher) {
+            Teacher otherTeacher = (Teacher)other;
+            return Objects.equals(name, otherTeacher.name) && age == otherTeacher.age;
+        }
+
+        return false;
     }
 }

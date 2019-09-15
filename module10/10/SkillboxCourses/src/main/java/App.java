@@ -11,7 +11,7 @@ import skillbox.Subscription;
 import skillbox.SubscriptionId;
 import skillbox.Teacher;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class App {
@@ -38,7 +38,7 @@ public class App {
             System.out.printf("Студент с идентификатором %d не существует%n%n", id);
         }
         else {
-            List<Course> courses = student.getCourses();
+            Set<Course> courses = student.getCourses();
 
             if(courses.isEmpty()) {
                 System.out.println("Студент %s еще не подписан ни на один курс%n%n");
@@ -60,7 +60,7 @@ public class App {
             System.out.printf("Преподаватель с идентификатором %d не существует%n%n", id);
         }
         else {
-            List<Course> courses = teacher.getCourses();
+            Set<Course> courses = teacher.getCourses();
 
             if(courses.isEmpty()) {
                 System.out.printf("Преподаватель %s еще не ведет ни одного курса%n%n", teacher.getName());
@@ -91,7 +91,7 @@ public class App {
                 System.out.printf("Преподаватель курса \"%s\": %s%n", course.getName(), teacher.getName());
             }
 
-            List<Student> students = course.getStudents();
+            Set<Student> students = course.getStudents();
 
             if(students.isEmpty()) {
                 System.out.printf("На курсе \"%s\" еще пока нет курсантов%n%n", course.getName());
