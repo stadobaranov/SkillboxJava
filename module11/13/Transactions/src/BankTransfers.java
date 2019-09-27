@@ -1,12 +1,9 @@
 public class BankTransfers implements Runnable {
-    private static final long MIN_TRANSFER = 2500;
-    private static final long MAX_TRANSFER = 52500;
+    private static final long MIN_TRANSFER = 2_500;
+    private static final long MAX_TRANSFER = 52_500;
 
-    // Для теста на большее кол-во операций и жесткой конкуренции, стоит понизить
-    // максимальную сумму трансфера, чтоб исключить задержки по 1сек. на
-    // "службу безопасноти".
-    // private static final long MIN_TRANSFER = 2500;
-    // private static final long MAX_TRANSFER = 42500;
+    // private static final long MIN_TRANSFER = 2_500;
+    // private static final long MAX_TRANSFER = 42_500;
 
     private final int transfers;
     private final Account accounts[];
@@ -33,7 +30,13 @@ public class BankTransfers implements Runnable {
             }
 
             long amount = MIN_TRANSFER + (long)((MAX_TRANSFER - MIN_TRANSFER) * Math.random());
-            bank.transfer(accounts[from].getNumber(), accounts[to].getNumber(), amount);
+
+            try {
+                bank.transfer(accounts[from].getNumber(), accounts[to].getNumber(), amount);
+            }
+            catch(BankException exception) {
+                System.out.println(exception.getMessage());
+            }
         }
     }
 }

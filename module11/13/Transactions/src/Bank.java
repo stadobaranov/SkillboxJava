@@ -4,12 +4,14 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Bank {
+    private final long fraudCheckingTime;
+    private final long fraudThreshold;
     private final Map<String, Account> accounts;
     private final Random random = new Random();
 
-    public Bank(Account accounts[]) {
-        // Т.к. карта с аккаунтами не модифицируется, достаточно HashMap реализации, freeze action для
-        // final поля в конце конструктора обеспечивает безопасную публикацию.
+    public Bank(long fraudCheckingTime, long fraudThreshold, Account accounts[]) {
+        this.fraudCheckingTime = fraudCheckingTime;
+        this.fraudThreshold = fraudThreshold;
         this.accounts = mapAccounts(accounts);
     }
 
@@ -21,6 +23,13 @@ public class Bank {
         }
 
         return mapped;
+    }
+
+    /**
+     * TODO: реализовать метод. Возвращает остаток на счёте.
+     */
+    public long getBalance(String accountNumber) {
+        return findAccount(accountNumber).getBalance();
     }
 
     /**
@@ -37,73 +46,135 @@ public class Bank {
         }
 
         Account from = findAccount(fromAccountNumber);
-
-        // Т.к. поле с флагом блокировки volatile, записи в (4) и (5) happens-before (6)
-        if(from.isBlocked()) { // (6)
-            return;
-        }
-
         Account to = findAccount(toAccountNumber);
 
-        // Т.к. поле с флагом блокировки volatile, записи в (4) и (5) happens-before (7)
-        if(to.isBlocked()) { // (7)
+        if(from.equals(to)) {
             return;
         }
 
-        int comparison = from.compareTo(to);
-        Account first;
-        Account second;
-
-        if(comparison > 0) {
-            first = to;
-            second = from;
-        }
-        else if(comparison < 0) {
-            first = from;
-            second = to;
-        }
-        else {
-            return;
+        if(from.isBlocked()) {
+            throwAccountBlockedException(fromAccountNumber);
         }
 
-        synchronized(first) {
-            // Т.к. поле с флагом блокировки volatile, записи в (4) и (5) happens-before (8)
-            if(first.isBlocked()) { // (8)
-                return;
-            }
+        if(to.isBlocked()) {
+            throwAccountBlockedException(toAccountNumber);
+        }
 
-            synchronized(second) {
-                // Т.к. поле с флагом блокировки volatile, записи в (4) и (5) happens-before (9)
-                if(second.isBlocked()) { // (9)
-                    return;
-                }
+        synchronized(from) {
+            // Снятие денег с первого аккаунта.
+            changeBalance(from, -amount);
+        }
 
-                long fromBalance = from.getMoney();
-                long toBalance = to.getMoney();
-
-                if(amount > fromBalance) {
-                    return;
-                }
-
-                from.setMoney(fromBalance - amount); // (1)
-                to.setMoney(toBalance + amount); // (2)
+        try {
+            synchronized(to) {
+                // Зачисление денег на второй аккаунт.
+                changeBalance(to, amount);
             }
         }
-
-        if(amount > 50000 && isFraud(fromAccountNumber, toAccountNumber, amount)) {
+        catch(AccountBlockedException exception) {
             synchronized(from) {
-                from.block(); // (4)
+                // В случае если второй аккаунт заблокирован, возврат денег на 1й аккаунт в любом случае.
+                from.setBalance(from.getBalance() + amount);
+
+                // Если аккаунт был помечен как проверяемый у СБ, возврат к исходному состоянию,
+                // и уведомление всех потоков, которые ждут окончания его проверки.
+                if(amount >= fraudThreshold) {
+                    // assert from.isFraudChecking();
+                    from.changeStateToNormal();
+                    from.notifyAll();
+                }
+            }
+
+            throw exception;
+        }
+
+        if(amount >= fraudThreshold) {
+            boolean fraud = isFraud(fromAccountNumber, toAccountNumber, amount);
+
+            synchronized(from) {
+                changeStateAfterFraudChecking(from, fraud);
             }
 
             synchronized(to) {
-                to.block(); // (5)
+                changeStateAfterFraudChecking(to, fraud);
             }
         }
     }
 
+    private Account findAccount(String accountNumber) {
+        Account account = accounts.get(accountNumber);
+
+        if(account == null) {
+            throw new AccountNotFoundException(
+                String.format("Аккаунт с номером %s не существует", accountNumber));
+        }
+
+        return account;
+    }
+
+    private static void throwAccountBlockedException(String number) {
+        throw new AccountBlockedException(String.format("Аккаунт %s заблокирован", number));
+    }
+
+    private void changeBalance(Account account, long amount) {
+        // Spurious wakeup...
+        for(;;) {
+            // Если аккаунт заблокирован, то баланс остается неизменным.
+            if(account.isBlocked()) {
+                throwAccountBlockedException(account.getNumber());
+            }
+            // Если аккаунт находится на проверке у СБ, паркуем данный поток и ожидаем ее окончание.
+            else if(account.isFraudChecking()) {
+                // boolean interrupted = false;
+
+                for(;;) {
+                    try {
+                        account.wait();
+                        break;
+                    }
+                    catch(InterruptedException exception) {
+                        // interrupted = true;
+                    }
+                }
+
+                // if(interrupted) {
+                //     Thread.currentThread().interrupt();
+                // }
+            }
+            else {
+                break;
+            }
+        }
+
+        long balance = account.getBalance() + amount;
+
+        if(balance < 0) {
+            throw new AccountInsufficientFundsException(
+                String.format("На аккаунте %s недостаточно средств", account.getNumber()));
+        }
+
+        account.setBalance(balance);
+
+        // Помечаем аккаунт как проверяемы СБ, если сумма больше fraudThreshold.
+        if(amount >= fraudThreshold) {
+            account.changeStateToFraudChecking();
+        }
+    }
+
+    private static void changeStateAfterFraudChecking(Account account, boolean fraud) {
+        if(fraud) {
+            account.changeStateToBlocked();
+        }
+        else {
+            account.changeStateToNormal();
+        }
+
+        account.notifyAll();
+    }
+
     private synchronized boolean isFraud(String fromAccountNumber, String toAccountNumber, long amount) {
         long start = System.nanoTime();
-        long remaining = 1000;
+        long remaining = fraudCheckingTime;
 
         while(remaining > 0) {
             try {
@@ -116,24 +187,5 @@ public class Bank {
         }
 
         return random.nextBoolean();
-    }
-
-    /**
-     * TODO: реализовать метод. Возвращает остаток на счёте.
-     */
-    public long getBalance(String accountNumber) {
-        // Т.к. поле с суммой аккаунта volatile, записи в (1) и (2) happens-before (3)
-        return findAccount(accountNumber).getMoney(); // (3)
-    }
-
-    private Account findAccount(String accountNumber) {
-        Account account = accounts.get(accountNumber);
-
-        if(account == null) {
-            throw new AccountNotFoundException(
-                String.format("Аккаунт с номером %s не существует", accountNumber));
-        }
-
-        return account;
     }
 }
