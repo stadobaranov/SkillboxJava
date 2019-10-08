@@ -22,6 +22,13 @@ public class ToDoTask {
         this.createdAt = createdAt;
     }
 
+    public ToDoTask(ToDoTask other) {
+        this.id = other.id;
+        this.name = other.name;
+        this.createdAt = other.createdAt;
+        this.completedAt = other.completedAt;
+    }
+
     public int getId() {
         return id;
     }

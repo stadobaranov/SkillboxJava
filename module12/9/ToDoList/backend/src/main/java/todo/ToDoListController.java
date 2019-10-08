@@ -1,5 +1,6 @@
 package todo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,12 @@ import java.util.List;
 public class ToDoListController {
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
-    private final ToDoList tasks = new ToDoList();
+    private final ToDoList tasks;
+
+    @Autowired
+    public ToDoListController(ToDoList tasks) {
+        this.tasks = tasks;
+    }
 
     @GetMapping("/tasks")
     public List<ToDoTask> getAll() {
@@ -52,8 +58,10 @@ public class ToDoListController {
         if(task != null) {
             task.complete(request.getValue());
 
-            LocalDateTime completedAt = task.getCompletedAt();
-            return ResponseEntity.ok(completedAt != null? completedAt.format(dateTimeFormatter): null);
+            if(tasks.update(task)) {
+                LocalDateTime completedAt = task.getCompletedAt();
+                return ResponseEntity.ok(completedAt != null? completedAt.format(dateTimeFormatter): null);
+            }
         }
 
         return ResponseEntity.notFound().build();
@@ -65,7 +73,10 @@ public class ToDoListController {
 
         if(task != null) {
             task.setName(request.getName());
-            return ResponseEntity.ok(null);
+
+            if(tasks.update(task)) {
+                return ResponseEntity.ok(null);
+            }
         }
 
         return ResponseEntity.notFound().build();
