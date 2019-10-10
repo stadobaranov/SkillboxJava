@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+        <title>ToDoList</title>
+        <script type="text/javascript" th:inline="javascript">
+            window.tasks = /*[[${tasks}]]*/ [];
+        </script>
+    </head>
+    <body>
+        <div id="to-do-application"></div>
+    </body>
+</html>
