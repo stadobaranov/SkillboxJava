@@ -26,20 +26,21 @@ public class QueuedCarNumberProducer extends Thread {
                             builder.append(letters[k]);
                             builder.append(letters[l]);
                             appendPaddedNumberTo(builder, i, 2);
+                            builder.append('\n');
+                        }
 
-                            for(;;) {
-                                try {
-                                    queue.put(builder.toString());
-                                }
-                                catch(InterruptedException exception) {
-                                    continue;
-                                }
-
-                                break;
+                        for(;;) {
+                            try {
+                                queue.put(builder.toString());
+                            }
+                            catch(InterruptedException exception) {
+                                continue;
                             }
 
-                            builder.setLength(0);
+                            break;
                         }
+
+                        builder.setLength(0);
                     }
                 }
             }

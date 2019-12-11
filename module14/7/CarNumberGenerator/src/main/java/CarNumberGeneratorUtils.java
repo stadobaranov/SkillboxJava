@@ -36,4 +36,14 @@ public class CarNumberGeneratorUtils {
             }
         }
     }
+
+    public static void appendPaddedNumberTo(StringBuilder builder, int number, int length) {
+        String numberString = String.valueOf(number);
+
+        for(int i = 0, e = length - numberString.length(); i < e; i++) {
+            builder.append('0');
+        }
+
+        builder.append(numberString);
+    }
 }

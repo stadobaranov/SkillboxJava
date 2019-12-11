@@ -1,12 +1,9 @@
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 public class QueuedCarNumberConsumer extends Thread {
-    private static final int BUFFER_SIZE = 8 * 1024;
-
     private final String directoryPath;
     private final BlockingQueue<String> queue;
     private volatile boolean shutdown;
@@ -20,35 +17,30 @@ public class QueuedCarNumberConsumer extends Thread {
     public void run() {
         String fileName = directoryPath + File.separator + "numbers";
 
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(fileName), BUFFER_SIZE)) {
+        try(FileWriter writer = new FileWriter(fileName)) {
             while(!shutdown) {
                 try {
-                    writeTo(writer, queue.take());
+                    writer.write(queue.take());
                 }
                 catch(InterruptedException exception) {}
             }
 
-            String number;
+            String numbers;
 
             for(;;) {
-                number = queue.poll();
+                numbers = queue.poll();
 
-                if(number == null) {
+                if(numbers == null) {
                     return;
                 }
 
-                writeTo(writer, number);
+                writer.write(numbers);
             }
         }
         catch(IOException exception) {
             System.out.println("Во время записи автомобильных госномеров возникло исключение:");
             exception.getCause().printStackTrace(System.out);
         }
-    }
-
-    private static void writeTo(BufferedWriter writer, String number) throws IOException {
-        writer.write(number);
-        writer.newLine();
     }
 
     public void shutdown() {

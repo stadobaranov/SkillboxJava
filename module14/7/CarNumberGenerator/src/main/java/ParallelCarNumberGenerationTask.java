@@ -1,13 +1,9 @@
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.concurrent.Callable;
 
 public class ParallelCarNumberGenerationTask implements Callable<Void> {
-    private static final int BUFFER_SIZE = 8 * 1024;
-
     private final String directoryPath;
     private final int startRegion;
     private final int endRegion;
@@ -23,19 +19,24 @@ public class ParallelCarNumberGenerationTask implements Callable<Void> {
         char letters[] = CarNumberGeneratorUtils.getLetters();
         String fileName = directoryPath + File.separator + startRegion + '-' + (endRegion - 1);
 
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(fileName), BUFFER_SIZE)) {
+        try(FileWriter writer = new FileWriter(fileName)) {
+            StringBuilder builder = new StringBuilder();
+
             for(int i = startRegion; i < endRegion; i++) {
                 for(int j = 0; j < letters.length; j++) {
                     for(int k = 0; k < letters.length; k++) {
                         for(int l = 0; l < letters.length; l++) {
                             for(int m = 1; m < 1000; m++) {
-                                writer.write(letters[j]);
-                                writePaddedNumberTo(writer, m, 3);
-                                writer.write(letters[k]);
-                                writer.write(letters[l]);
-                                writePaddedNumberTo(writer, i, 2);
-                                writer.newLine();
+                                builder.append(letters[j]);
+                                CarNumberGeneratorUtils.appendPaddedNumberTo(builder, m, 3);
+                                builder.append(letters[k]);
+                                builder.append(letters[l]);
+                                CarNumberGeneratorUtils.appendPaddedNumberTo(builder, i, 2);
+                                builder.append('\n');
                             }
+
+                            writer.write(builder.toString());
+                            builder.setLength(0);
                         }
                     }
                 }
@@ -43,15 +44,5 @@ public class ParallelCarNumberGenerationTask implements Callable<Void> {
         }
 
         return null;
-    }
-
-    private static void writePaddedNumberTo(Writer writer, int number, int length) throws IOException {
-        String numberString = String.valueOf(number);
-
-        for(int i = 0, e = length - numberString.length(); i < e; i++) {
-            writer.write("0");
-        }
-
-        writer.write(numberString);
     }
 }
