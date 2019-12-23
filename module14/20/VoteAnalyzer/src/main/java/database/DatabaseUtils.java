@@ -1,4 +1,4 @@
-package vote.database;
+package database;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

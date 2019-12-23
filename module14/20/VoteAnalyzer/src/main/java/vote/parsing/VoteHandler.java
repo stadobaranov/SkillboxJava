@@ -5,7 +5,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import vote.BirthDayFormatException;
 import vote.Voter;
-import vote.database.VoterInserter;
+import vote.database.VoterVisitRegistrar;
 import java.sql.SQLException;
 
 public class VoteHandler extends DefaultHandler {
@@ -15,10 +15,10 @@ public class VoteHandler extends DefaultHandler {
 
     private HandlingStatus currentStatus = HandlingStatus.START;
     private Voter currentVoter;
-    private final VoterInserter voterInserter;
+    private final VoterVisitRegistrar visitRegistrar;
 
-    public VoteHandler(VoterInserter voterInserter) {
-        this.voterInserter = voterInserter;
+    public VoteHandler(VoterVisitRegistrar visitRegistrar) {
+        this.visitRegistrar = visitRegistrar;
     }
 
     @Override
@@ -69,10 +69,10 @@ public class VoteHandler extends DefaultHandler {
             checkCurrentStatus(HandlingStatus.VISIT);
 
             try {
-                voterInserter.insert(currentVoter);
+                visitRegistrar.register(currentVoter);
             }
             catch(SQLException exception) {
-                throw new SAXException("Не удалось добавить избирателя в БД", exception);
+                throw new SAXException("Не удалось добавить визит избирателя в БД", exception);
             }
 
             currentStatus = HandlingStatus.VOTER;

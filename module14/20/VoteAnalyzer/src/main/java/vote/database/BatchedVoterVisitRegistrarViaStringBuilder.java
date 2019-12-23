@@ -1,21 +1,23 @@
 package vote.database;
 
+import database.Database;
+import database.DatabaseUtils;
 import vote.Voter;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class BatchedVoterInserterViaStringBuilder extends BatchedVoterInserter {
+public class BatchedVoterVisitRegistrarViaStringBuilder extends BatchedVoterVisitRegistrar {
     private final StringBuilder valuesBuilder = new StringBuilder();
     private final Database database;
 
-    public BatchedVoterInserterViaStringBuilder(Database database, int votersPerQuery) {
-        super(votersPerQuery);
+    public BatchedVoterVisitRegistrarViaStringBuilder(Database database, int batchThreshold) {
+        super(batchThreshold);
         this.database = database;
     }
 
     @Override
-    protected void insertVoter(Voter voter) throws SQLException {
-        if(getVotersCount() > 0) {
+    protected void registerVisit(Voter voter) {
+        if(getCount() > 0) {
             valuesBuilder.append(',');
         }
 
@@ -29,14 +31,9 @@ public class BatchedVoterInserterViaStringBuilder extends BatchedVoterInserter {
     }
 
     @Override
-    protected void flushVoters() throws SQLException {
+    protected void flushVisits() throws SQLException {
         try(Statement statement = database.getConnection().createStatement()) {
-            statement.execute(
-                String.format(
-                    "INSERT INTO `voters`(`name`, `birthDay`) VALUES%s ON DUPLICATE KEY UPDATE `count` = `count` + 1",
-                    valuesBuilder.toString()
-                )
-            );
+            statement.execute("INSERT INTO `voterVisits`(`name`, `birthDay`) VALUES" + valuesBuilder.toString());
         }
 
         valuesBuilder.setLength(0);

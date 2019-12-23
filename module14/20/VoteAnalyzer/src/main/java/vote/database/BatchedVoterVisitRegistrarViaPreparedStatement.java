@@ -1,24 +1,24 @@
 package vote.database;
 
+import database.Database;
+import database.DatabaseUtils;
 import vote.Voter;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class BatchedVoterInserterViaPreparedStatement extends BatchedVoterInserter {
+public class BatchedVoterVisitRegistrarViaPreparedStatement extends BatchedVoterVisitRegistrar {
     private final Database database;
     private PreparedStatement statement;
 
-    public BatchedVoterInserterViaPreparedStatement(Database database, int votersPerQuery) {
-        super(votersPerQuery);
+    public BatchedVoterVisitRegistrarViaPreparedStatement(Database database, int batchThreshold) {
+        super(batchThreshold);
         this.database = database;
     }
 
     @Override
-    protected void insertVoter(Voter voter) throws SQLException {
+    protected void registerVisit(Voter voter) throws SQLException {
         if(statement == null) {
-            statement = database.getConnection().prepareStatement(
-                "INSERT INTO `voters`(`name`, `birthDay`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + 1"
-            );
+            statement = database.getConnection().prepareStatement("INSERT INTO `voterVisits`(`name`, `birthDay`) VALUES(?, ?)");
         }
 
         String birthDayString = DatabaseUtils.formatDate(voter.getBirthDay());
@@ -29,8 +29,10 @@ public class BatchedVoterInserterViaPreparedStatement extends BatchedVoterInsert
     }
 
     @Override
-    protected void flushVoters() throws SQLException {
-        statement.executeBatch();
+    protected void flushVisits() throws SQLException {
+        if(statement != null) {
+            statement.executeBatch();
+        }
     }
 
     @Override
