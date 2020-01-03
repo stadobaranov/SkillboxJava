@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ApplicationForm">
+  <grid id="27dc6" binding="rootPanel" layout-manager="CardLayout" hgap="20" vgap="10" show="533d5">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="533d5" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <card name="EXPANDED"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="a8af8" layout-manager="GridBagLayout">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="bfad8" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0" ipadx="10" ipady="30"/>
+                </constraints>
+                <properties>
+                  <text value="First name:"/>
+                </properties>
+              </component>
+              <component id="b6895" class="javax.swing.JTextField" binding="firstNameTextField">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <gridbag weightx="1.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <margin top="2" left="6" bottom="2" right="6"/>
+                  <preferredSize width="64" height="32"/>
+                </properties>
+              </component>
+              <component id="c03b0" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0" ipadx="10" ipady="30"/>
+                </constraints>
+                <properties>
+                  <text value="Middle name:"/>
+                </properties>
+              </component>
+              <component id="420f7" class="javax.swing.JTextField" binding="middleNameTextField">
+                <constraints>
+                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <gridbag weightx="1.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <margin top="2" left="6" bottom="2" right="6"/>
+                  <preferredSize width="64" height="32"/>
+                </properties>
+              </component>
+              <component id="7e136" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0" ipadx="10" ipady="30"/>
+                </constraints>
+                <properties>
+                  <text value="Last name:"/>
+                </properties>
+              </component>
+              <component id="706a7" class="javax.swing.JTextField" binding="lastNameTextField">
+                <constraints>
+                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <gridbag weightx="1.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <margin top="2" left="6" bottom="2" right="6"/>
+                  <preferredSize width="64" height="32"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="e3b93" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="South"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="f08dd" class="javax.swing.JButton" binding="collapseButton">
+                <constraints/>
+                <properties>
+                  <actionCommand value="Button"/>
+                  <text value="Collapse"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="19fb7" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <card name="COLLAPSED"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="1566d" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="South"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="2daad" class="javax.swing.JButton" binding="expandButton">
+                <constraints/>
+                <properties>
+                  <actionCommand value="Button"/>
+                  <text value="Expand"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="301e" layout-manager="GridBagLayout">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="33acc" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0" ipadx="10" ipady="30"/>
+                </constraints>
+                <properties>
+                  <text value="Full name:"/>
+                </properties>
+              </component>
+              <component id="1d9d7" class="javax.swing.JTextField" binding="fullNameTextField">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <gridbag weightx="1.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <margin top="2" left="6" bottom="2" right="6"/>
+                  <preferredSize width="64" height="32"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
